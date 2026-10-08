@@ -1,10 +1,17 @@
 import axios, { type InternalAxiosRequestConfig } from "axios"
 import { useAuthStore } from "../stores/auth-store"
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api"
+const rawApiUrl =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "/api"
+
+const API_BASE_URL = rawApiUrl.replace(/\/+$/, "")
+const API_TIMEOUT = Number(import.meta.env.VITE_API_TIMEOUT) || 30000
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: API_TIMEOUT,
   withCredentials: true,
 })
 

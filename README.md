@@ -50,9 +50,26 @@ npm install
 npm run dev
 ```
 
-Aplikasi dapat diakses di `http://localhost:5173`. Request `/api/*` secara otomatis di-proxy ke backend `http://localhost:8080`.
+Aplikasi dapat diakses di `http://localhost:5173`. Request `/api/*` secara otomatis di-proxy ke backend sesuai konfigurasi `.env`.
 
-### 3. Build Produksi
+### 3. Konfigurasi Environment (`.env`)
+
+Salin file `.env.example` ke `.env` dan sesuaikan nilainya:
+
+```bash
+cp .env.example .env
+```
+
+| Variabel | Default | Deskripsi |
+|---|---|---|
+| `VITE_API_URL` | `http://localhost:8080/api` | Base URL API backend devops-service (bisa URL absolut atau `/api`) |
+| `VITE_API_TARGET` | `http://localhost:8080` | Host backend target untuk internal proxy Vite development |
+| `VITE_API_TIMEOUT` | `30000` | Timeout request HTTP dalam milidetik (30 detik) |
+| `VITE_APP_TITLE` | `DevOps Panel - OpenVPN Management` | Judul aplikasi pada browser tab (`index.html`) |
+| `VITE_PORT` | `5173` | Port dev server Vite |
+| `VITE_DEFAULT_THEME` | `dark` | Tema awal sebelum user melakukan toggle (`dark` / `light`) |
+
+### 4. Build Produksi
 
 ```bash
 npm run build

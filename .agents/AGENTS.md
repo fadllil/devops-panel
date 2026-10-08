@@ -88,6 +88,12 @@ Gunakan path aliases yang telah terkonfigurasi di `package.json` dan `components
 - Respons error HTTP 401 secara otomatis mengaktifkan interceptor untuk refresh token ke `/api/auth/refresh/:id`. Jika refresh gagal, sesi dibersihkan dan dialihkan ke `/login`.
 - Tampilkan notifikasi interaktif ke user menggunakan `toast` dari `sonner` (`toast.success()`, `toast.error()`).
 
+### 7. Environment Variables (`.env`)
+- Semua variabel frontend **HARUS** diawali prefix `VITE_` (misal: `VITE_API_URL`, `VITE_API_TARGET`, `VITE_APP_TITLE`).
+- Daftarkan deklarasi tipe variabel baru di `src/vite-env.d.ts` agar memiliki type safety & autocomplete.
+- Jangan hardcode URL API backend, port, atau timeout pada komponen atau service; gunakan `import.meta.env` dengan nilai fallback yang aman.
+- Setiap menambah variabel environment baru, **WAJIB** cantumkan contoh dan dokumentasinya di `.env.example`.
+
 ---
 
 ## Alur Menambah Fitur / Halaman Baru (Step-by-Step)

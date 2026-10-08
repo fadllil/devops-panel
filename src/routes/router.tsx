@@ -10,17 +10,21 @@ import { NotFoundPage } from "../pages/not-found-page"
 import { ProfilePage } from "../pages/profile-page"
 import { RolesPage } from "../pages/roles-page"
 import { UsersPage } from "../pages/users-page"
+import { VPNClientsPage } from "../pages/vpn-clients-page"
 import { VPNServersPage } from "../pages/vpn-servers-page"
 import { protectedRouteGuard, publicRouteGuard } from "../lib/route-guards"
 
 function AppShell() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
+    const defaultTheme =
+      (import.meta.env.VITE_DEFAULT_THEME as "light" | "dark") || "dark"
+
     if (typeof window === "undefined") {
-      return "dark"
+      return defaultTheme
     }
 
     const savedTheme = window.localStorage.getItem("devops-theme")
-    return savedTheme === "light" ? "light" : "dark"
+    return savedTheme === "light" || savedTheme === "dark" ? savedTheme : defaultTheme
   })
 
   useEffect(() => {
@@ -64,6 +68,14 @@ const vpnServersRoute = createRoute({
   pendingComponent: ProtectedPageLoader,
 })
 
+const vpnClientsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/vpn-clients",
+  component: VPNClientsPage,
+  beforeLoad: protectedRouteGuard,
+  pendingComponent: ProtectedPageLoader,
+})
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
@@ -98,6 +110,7 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   dashboardRoute,
   vpnServersRoute,
+  vpnClientsRoute,
   usersRoute,
   rolesRoute,
   profileRoute,

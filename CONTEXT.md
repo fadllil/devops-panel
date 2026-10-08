@@ -46,7 +46,8 @@ devops-panel/
     │   ├── auth.ts             # Login, logout, refresh API
     │   ├── users.ts            # CRUD Users & status updates
     │   ├── roles.ts            # CRUD Roles & listings
-    │   └── vpn-servers.ts      # CRUD OpenVPN Servers & details
+    │   ├── vpn-servers.ts      # CRUD OpenVPN Servers & details
+    │   └── vpn-clients.ts      # CRUD OpenVPN Clients, download config, email
     ├── components/             # Reusable UI components
     │   ├── sidebar.tsx         # Sidebar navigasi panel utama
     │   ├── theme-toggle.tsx    # Tombol toggle Light / Dark mode
@@ -59,6 +60,7 @@ devops-panel/
     │   ├── login-page.tsx      # Login form (mendukung penuh Light/Dark mode)
     │   ├── dashboard-page.tsx  # Dashboard overview & selamat datang
     │   ├── vpn-servers-page.tsx# Manajemen server OpenVPN (CRUD, modal, detail)
+    │   ├── vpn-clients-page.tsx# Manajemen client OpenVPN (CRUD, .ovpn download, email)
     │   ├── users-page.tsx      # Manajemen pengguna internal
     │   ├── roles-page.tsx      # Manajemen role dan izin
     │   ├── profile-page.tsx    # Profil pengguna & ganti password
@@ -71,7 +73,8 @@ devops-panel/
     │   └── globals.css         # Tailwind v4, OKLCH color tokens, .dark class
     └── types/                  # TypeScript definitions
         ├── auth.ts             # DTO response, UserProfile, Role, Pagination
-        └── vpn-server.ts       # DTO VPNServer, Create/Update payload, Pagination
+        ├── vpn-server.ts       # DTO VPNServer, Create/Update payload, Pagination
+        └── vpn-client.ts       # DTO VPNClient, Create/Update payload, Pagination
 ```
 
 ---
@@ -83,11 +86,11 @@ devops-panel/
 | `/login` | `LoginPage` | ✅ Selesai | `publicRouteGuard` | Login autentikasi, support Light & Dark theme shadcn UI, toggle show password |
 | `/` | `DashboardPage` | ✅ Selesai | `protectedRouteGuard` | Kartu selamat datang, info akun, aksi logout |
 | `/vpn-servers` | `VPNServersPage` | ✅ Selesai | `protectedRouteGuard` | CRUD OpenVPN server, modal dialog, detail server, horizontal scroll table |
+| `/vpn-clients` | `VPNClientsPage` | ✅ Selesai | `protectedRouteGuard` | CRUD client OpenVPN, penerbitan sertifikat, unduh profil `.ovpn`, kirim email, statistik data |
 | `/users` | `UsersPage` | ✅ Selesai | `protectedRouteGuard` | Tabel user dengan paginasi, pencarian, create, edit modal, toggle aktif |
 | `/roles` | `RolesPage` | ✅ Selesai | `protectedRouteGuard` | Tabel role dengan paginasi, pencarian, create, edit modal |
 | `/profile` | `ProfilePage` | ✅ Selesai | `protectedRouteGuard` | Detail profil pengguna yang sedang login & form ganti password |
 | `*` | `NotFoundPage` | ✅ Selesai | — | Tampilan 404 dengan tombol navigasi kembali |
-| `/vpn-clients` | Planned | ⏳ Rencana | `protectedRouteGuard` | Manajemen client VPN (generate `.ovpn`, revoke, change password) |
 | `/logs` | Planned | ⏳ Rencana | `protectedRouteGuard` | Log histori koneksi VPN OpenVPN |
 
 ---
@@ -119,6 +122,21 @@ devops-panel/
 
 ---
 
+## Environment Configuration (.env)
+
+Konfigurasi runtime & dev server dikelola via file `.env` (template di `.env.example`):
+
+| Variabel | Fungsi |
+|---|---|
+| `VITE_API_URL` | Base URL Axios untuk seluruh request API (`https://domain.com/api` atau `/api`) |
+| `VITE_API_TARGET` | Target backend untuk reverse proxy internal Vite saat development |
+| `VITE_API_TIMEOUT` | Timeout HTTP request Axios dalam milidetik (default 30000) |
+| `VITE_APP_TITLE` | Judul aplikasi yang diinjeksi ke `<title>` tag HTML |
+| `VITE_PORT` | Port lokal development server Vite (default 5173) |
+| `VITE_DEFAULT_THEME` | Tema fallback sebelum user memilih preferensi (`dark` atau `light`) |
+
+---
+
 ## Development
 
 ```bash
@@ -128,7 +146,7 @@ cd devops-panel
 # Install dependencies (jika baru)
 npm install
 
-# Jalankan dev server (Vite dengan proxy /api ke http://localhost:8080)
+# Jalankan dev server (Vite dengan proxy /api ke target di .env)
 npm run dev
 
 # Type-check dan build bundle

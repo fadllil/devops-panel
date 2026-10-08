@@ -1,10 +1,17 @@
 import { useNavigate } from "@tanstack/react-router"
-import { LayoutDashboard, Server, Shield, UserCircle2, Users } from "lucide-react"
+import {
+  KeyRound,
+  LayoutDashboard,
+  Server,
+  Shield,
+  UserCircle2,
+  Users,
+} from "lucide-react"
 
 import { Button } from "#components/ui/button"
 
 type SidebarProps = {
-  active: "dashboard" | "users" | "roles" | "profile" | "vpn-servers"
+  active: "dashboard" | "users" | "roles" | "profile" | "vpn-servers" | "vpn-clients"
 }
 
 const links = [
@@ -19,6 +26,12 @@ const links = [
     label: "VPN Servers",
     icon: Server,
     path: "/vpn-servers",
+  },
+  {
+    key: "vpn-clients" as const,
+    label: "VPN Clients",
+    icon: KeyRound,
+    path: "/vpn-clients",
   },
   {
     key: "users" as const,
