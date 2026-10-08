@@ -1,75 +1,76 @@
-# React + TypeScript + Vite
+# DevOps Panel (Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Antarmuka web manajemen DevOps berbasis React 19, TypeScript, Vite, dan Tailwind CSS v4 dengan komponen Shadcn UI. Dashboard ini terintegrasi dengan backend [devops-service](../devops-service) untuk mengelola pengguna, role, dan OpenVPN.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Tech Stack
 
-## React Compiler
+- **Framework**: React 19, TypeScript
+- **Bundler**: Vite 8
+- **Routing**: `@tanstack/react-router`
+- **State Management**: Zustand
+- **Server State**: `@tanstack/react-query`
+- **Styling**: Tailwind CSS v4, `tw-animate-css`
+- **Design System**: Shadcn UI (`base-nova` style, Base UI primitives, OKLCH color variables)
+- **Icons & Notification**: `lucide-react`, `sonner`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Struktur Direktori
 
 ```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+src/
+├── api/          # Axios instance & HTTP endpoints (auth, users, roles)
+├── components/   # Shared UI components (sidebar, theme-toggle)
+│   └── ui/       # Shadcn UI primitives (button, card, input, label, badge, table)
+├── lib/          # Utilities (cn helper) & route guards
+├── pages/        # Halaman (login, dashboard, users, roles, profile, 404)
+├── routes/       # Konfigurasi router & AppShell
+├── stores/       # Zustand persistent auth store
+├── styles/       # globals.css dengan tema Light & Dark
+└── types/        # TypeScript DTO dan models
 ```
+
+---
+
+## Memulai Pengembangan
+
+### 1. Prasyarat
+- Node.js v20+
+- Backend `devops-service` berjalan di port `8080` (opsional untuk full flow)
+
+### 2. Instalasi & Menjalankan
+
+```bash
+# Instal dependensi
+npm install
+
+# Jalankan server pengembangan (Hot Module Replacement)
+npm run dev
+```
+
+Aplikasi dapat diakses di `http://localhost:5173`. Request `/api/*` secara otomatis di-proxy ke backend `http://localhost:8080`.
+
+### 3. Build Produksi
+
+```bash
+npm run build
+```
+
+---
+
+## Fitur Utama
+
+- 🌓 **Dukungan Tema Penuh**: Switcher Light dan Dark mode instan yang didukung oleh token warna Shadcn UI.
+- 🔐 **Autentikasi & Guard**: Sesi terproteksi dengan TanStack Router guards dan silent token refresh pada error 401.
+- 👥 **Manajemen User & Role**: CRUD pengguna dan role lengkap dengan paginasi, pencarian, dan modal interaktif.
+- 🎨 **Tampilan Modern**: Halaman login dan dashboard yang terstruktur, rapi, dan responsif.
+
+---
+
+## Dokumentasi Konteks & Aturan AI
+
+- Untuk aturan pengembangan AI agent: [.agents/AGENTS.md](.agents/AGENTS.md)
+- Untuk konteks mendalam arsitektur frontend: [CONTEXT.md](CONTEXT.md)
+- Untuk arsitektur monorepo keseluruhan: [../CONTEXT.md](../CONTEXT.md)
