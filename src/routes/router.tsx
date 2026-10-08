@@ -10,6 +10,7 @@ import { NotFoundPage } from "../pages/not-found-page"
 import { ProfilePage } from "../pages/profile-page"
 import { RolesPage } from "../pages/roles-page"
 import { UsersPage } from "../pages/users-page"
+import { VPNServersPage } from "../pages/vpn-servers-page"
 import { protectedRouteGuard, publicRouteGuard } from "../lib/route-guards"
 
 function AppShell() {
@@ -55,6 +56,14 @@ const dashboardRoute = createRoute({
   pendingComponent: ProtectedPageLoader,
 })
 
+const vpnServersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/vpn-servers",
+  component: VPNServersPage,
+  beforeLoad: protectedRouteGuard,
+  pendingComponent: ProtectedPageLoader,
+})
+
 const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
@@ -88,6 +97,7 @@ const notFoundRoute = createRoute({
 const routeTree = rootRoute.addChildren([
   loginRoute,
   dashboardRoute,
+  vpnServersRoute,
   usersRoute,
   rolesRoute,
   profileRoute,
