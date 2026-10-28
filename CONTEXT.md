@@ -153,6 +153,14 @@ npm install
 # Jalankan dev server (Vite dengan proxy /api ke target di .env)
 npm run dev
 
-# Type-check dan build bundle
+# Type-check dan build bundle (menghasilkan dist/ assets biasa & pre-compressed .gz)
 npm run build
 ```
+
+---
+
+## Build & Asset Compression
+
+Aplikasi menggunakan `vite-plugin-compression` untuk menghasilkan pre-compressed static assets (`.gz`) saat `npm run build`:
+- File asset JS & CSS di atas ukuran 10KB dikompresi menjadi file `.gz` berdampingan dengan file aslinya.
+- Di level Nginx (`nginx.conf`), directive `gzip_static on;` diaktifkan sehingga Nginx langsung menyajikan file `.gz` yang sudah tersedia tanpa membebani CPU container saat runtime, dan tetap fallback ke dynamic gzip jika file `.gz` tidak ditemukan.
