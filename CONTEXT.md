@@ -33,7 +33,11 @@
 devops-panel/
 ├── .agents/
 │   └── AGENTS.md               # Aturan pengembangan dan konvensi AI agent
+├── .dockerignore               # File/folder yang diabaikan saat build docker
+├── .env.example                # Template konfigurasi environment
 ├── CONTEXT.md                  # Dokumen konteks frontend ini
+├── Dockerfile                  # Multi-stage production container image
+├── nginx.conf                  # Nginx web server config (SPA fallback & gzip)
 ├── README.md                   # Dokumentasi instalasi dan perintah dev
 ├── components.json             # Konfigurasi shadcn UI CLI
 ├── index.html                  # HTML entry point

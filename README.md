@@ -72,7 +72,21 @@ cp .env.example .env
 ### 4. Build Produksi
 
 ```bash
+# Build lokal via Vite
 npm run build
+```
+
+### 5. Menjalankan Menggunakan Docker
+
+```bash
+# Build docker image (bisa custom VITE_API_URL via --build-arg)
+docker build -t devops-panel .
+
+# Atau build dengan mengarahkan API URL tertentu:
+docker build --build-arg VITE_API_URL=https://devops-service.assist.id/api -t devops-panel .
+
+# Jalankan container (port 80 di host diarahkan ke port 80 container)
+docker run -d -p 80:80 --name devops-panel devops-panel
 ```
 
 ---
