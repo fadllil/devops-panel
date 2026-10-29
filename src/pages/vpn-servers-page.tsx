@@ -13,6 +13,7 @@ import { toast } from "sonner"
 
 import { Badge } from "#components/ui/badge"
 import { Button } from "#components/ui/button"
+import { Can } from "../components/can"
 import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card"
 import {
   Dialog,
@@ -255,10 +256,12 @@ export function VPNServersPage() {
                 Kelola infrastruktur server OpenVPN, endpoint VPN Agent, dan kredensial SSH.
               </p>
             </div>
-            <Button onClick={handleOpenCreateModal} className="shrink-0">
-              <PlusCircle className="mr-2 size-4" />
-              Tambah Server
-            </Button>
+            <Can do="vpn_servers:create">
+              <Button onClick={handleOpenCreateModal} className="shrink-0">
+                <PlusCircle className="mr-2 size-4" />
+                Tambah Server
+              </Button>
+            </Can>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -391,22 +394,26 @@ export function VPNServersPage() {
                               >
                                 <Info className="size-3.5" />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(server)}
-                                title="Edit Server"
-                              >
-                                <Pencil className="size-3.5" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDelete(server.id, server.name)}
-                                title="Hapus Server"
-                              >
-                                <Trash2 className="size-3.5" />
-                              </Button>
+                              <Can do="vpn_servers:update">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEdit(server)}
+                                  title="Edit Server"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </Button>
+                              </Can>
+                              <Can do="vpn_servers:delete">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDelete(server.id, server.name)}
+                                  title="Hapus Server"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </Button>
+                              </Can>
                             </div>
                           </TableCell>
                         </TableRow>

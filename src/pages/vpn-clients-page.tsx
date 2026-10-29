@@ -17,6 +17,7 @@ import { toast } from "sonner"
 
 import { Badge } from "#components/ui/badge"
 import { Button } from "#components/ui/button"
+import { Can } from "../components/can"
 import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card"
 import {
   Dialog,
@@ -324,10 +325,12 @@ export function VPNClientsPage() {
                 Kelola akun client OpenVPN, penerbitan sertifikat, download profil .ovpn, dan monitoring trafik.
               </p>
             </div>
-            <Button onClick={handleOpenCreateModal} className="shrink-0">
-              <PlusCircle className="mr-2 size-4" />
-              Tambah Client
-            </Button>
+            <Can do="vpn_clients:create">
+              <Button onClick={handleOpenCreateModal} className="shrink-0">
+                <PlusCircle className="mr-2 size-4" />
+                Tambah Client
+              </Button>
+            </Can>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -481,24 +484,28 @@ export function VPNClientsPage() {
                           </TableCell>
                           <TableCell className="text-right whitespace-nowrap">
                             <div className="flex justify-end gap-1">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => void handleDownload(client)}
-                                disabled={downloadingId === client.id}
-                                title="Download Config (.ovpn)"
-                              >
-                                <Download className="size-3.5" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => void handleSendEmail(client)}
-                                disabled={sendingEmailId === client.id}
-                                title="Kirim ke Email"
-                              >
-                                <Mail className="size-3.5" />
-                              </Button>
+                              <Can do="vpn_clients:download_config">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => void handleDownload(client)}
+                                  disabled={downloadingId === client.id}
+                                  title="Download Config (.ovpn)"
+                                >
+                                  <Download className="size-3.5" />
+                                </Button>
+                              </Can>
+                              <Can do="vpn_clients:send_email">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => void handleSendEmail(client)}
+                                  disabled={sendingEmailId === client.id}
+                                  title="Kirim ke Email"
+                                >
+                                  <Mail className="size-3.5" />
+                                </Button>
+                              </Can>
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -507,22 +514,26 @@ export function VPNClientsPage() {
                               >
                                 <Info className="size-3.5" />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(client)}
-                                title="Edit Client"
-                              >
-                                <Pencil className="size-3.5" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => void handleDelete(client.id, client.username)}
-                                title="Revoke & Hapus"
-                              >
-                                <Trash2 className="size-3.5" />
-                              </Button>
+                              <Can do="vpn_clients:update">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEdit(client)}
+                                  title="Edit Client"
+                                >
+                                  <Pencil className="size-3.5" />
+                                </Button>
+                              </Can>
+                              <Can do="vpn_clients:delete">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => void handleDelete(client.id, client.username)}
+                                  title="Revoke & Hapus"
+                                >
+                                  <Trash2 className="size-3.5" />
+                                </Button>
+                              </Can>
                             </div>
                           </TableCell>
                         </TableRow>

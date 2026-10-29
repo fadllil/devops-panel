@@ -12,7 +12,7 @@ import { RolesPage } from "../pages/roles-page"
 import { UsersPage } from "../pages/users-page"
 import { VPNClientsPage } from "../pages/vpn-clients-page"
 import { VPNServersPage } from "../pages/vpn-servers-page"
-import { protectedRouteGuard, publicRouteGuard } from "../lib/route-guards"
+import { permissionRouteGuard, protectedRouteGuard, publicRouteGuard } from "../lib/route-guards"
 
 function AppShell() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -64,7 +64,7 @@ const vpnServersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/vpn-servers",
   component: VPNServersPage,
-  beforeLoad: protectedRouteGuard,
+  beforeLoad: permissionRouteGuard("vpn_servers:read"),
   pendingComponent: ProtectedPageLoader,
 })
 
@@ -72,7 +72,7 @@ const vpnClientsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/vpn-clients",
   component: VPNClientsPage,
-  beforeLoad: protectedRouteGuard,
+  beforeLoad: permissionRouteGuard("vpn_clients:read"),
   pendingComponent: ProtectedPageLoader,
 })
 
@@ -80,7 +80,7 @@ const usersRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/users",
   component: UsersPage,
-  beforeLoad: protectedRouteGuard,
+  beforeLoad: permissionRouteGuard("users:read"),
   pendingComponent: ProtectedPageLoader,
 })
 
@@ -88,7 +88,7 @@ const rolesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/roles",
   component: RolesPage,
-  beforeLoad: protectedRouteGuard,
+  beforeLoad: permissionRouteGuard("roles:read"),
   pendingComponent: ProtectedPageLoader,
 })
 

@@ -4,6 +4,7 @@ import { toast } from "sonner"
 
 import { Badge } from "#components/ui/badge"
 import { Button } from "#components/ui/button"
+import { Can } from "../components/can"
 import { Card, CardContent, CardHeader, CardTitle } from "#components/ui/card"
 import {
   Dialog,
@@ -209,10 +210,12 @@ export function UsersPage() {
                 Kelola akun pengguna, role, dan status akses internal.
               </p>
             </div>
-            <Button onClick={handleOpenCreateModal} className="shrink-0">
-              <PlusCircle className="mr-2 size-4" />
-              Tambah User
-            </Button>
+            <Can do="users:create">
+              <Button onClick={handleOpenCreateModal} className="shrink-0">
+                <PlusCircle className="mr-2 size-4" />
+                Tambah User
+              </Button>
+            </Can>
           </CardHeader>
 
           <CardContent className="space-y-4">
@@ -323,22 +326,26 @@ export function UsersPage() {
                           </TableCell>
                           <TableCell className="text-right whitespace-nowrap">
                             <div className="flex justify-end gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEdit(user)}
-                                title="Edit User"
-                              >
-                                <Pencil className="size-4" />
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDelete(user.id)}
-                                title="Hapus User"
-                              >
-                                <Trash2 className="size-4" />
-                              </Button>
+                              <Can do="users:update">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEdit(user)}
+                                  title="Edit User"
+                                >
+                                  <Pencil className="size-4" />
+                                </Button>
+                              </Can>
+                              <Can do="users:delete">
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDelete(user.id)}
+                                  title="Hapus User"
+                                >
+                                  <Trash2 className="size-4" />
+                                </Button>
+                              </Can>
                             </div>
                           </TableCell>
                         </TableRow>

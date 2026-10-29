@@ -1,7 +1,7 @@
 # DevOps Panel — Frontend Context
 
 > **Auto-updated**: Dokumen ini mendokumentasikan arsitektur, state, halaman, dan desain `devops-panel`.
-> Terakhir diperbarui: **2026-10-09**
+> Terakhir diperbarui: **2026-10-28**
 
 ---
 
@@ -48,25 +48,29 @@ devops-panel/
     ├── api/                    # Integrasi REST API (Axios)
     │   ├── client.ts           # Axios instance, Bearer token, auto 401 refresh
     │   ├── auth.ts             # Login, logout, refresh API
+    │   ├── permissions.ts      # Retrieval katalog hak akses permissions
     │   ├── users.ts            # CRUD Users & status updates
-    │   ├── roles.ts            # CRUD Roles & listings
+    │   ├── roles.ts            # CRUD Roles, detail permissions, & listings
     │   ├── vpn-servers.ts      # CRUD OpenVPN Servers & details
     │   └── vpn-clients.ts      # CRUD OpenVPN Clients, download config, email
     ├── components/             # Reusable UI components
-    │   ├── sidebar.tsx         # Sidebar navigasi panel utama
+    │   ├── can.tsx             # Komponen deklaratif proteksi aksi (<Can do="...">)
+    │   ├── sidebar.tsx         # Sidebar navigasi adaptif berbasis hak akses user
     │   ├── theme-toggle.tsx    # Tombol toggle Light / Dark mode
     │   ├── protected-page-loader.tsx # Loading skeleton untuk protected routes
     │   └── ui/                 # Shadcn UI primitives (Button, Card, Input, Label, Badge, Table, Dialog)
+    ├── hooks/                  # Custom React Hooks
+    │   └── use-permission.ts   # Hook otorisasi RBAC (can, canAny, isSuperadmin)
     ├── lib/                    # Helper & utilities
     │   ├── utils.ts            # Helper cn() (clsx + tailwind-merge)
-    │   └── route-guards.ts     # protectedRouteGuard & publicRouteGuard
+    │   └── route-guards.ts     # protectedRouteGuard, permissionRouteGuard, & publicRouteGuard
     ├── pages/                  # Halaman aplikasi
     │   ├── login-page.tsx      # Login form (mendukung penuh Light/Dark mode)
     │   ├── dashboard-page.tsx  # Dashboard overview & selamat datang
     │   ├── vpn-servers-page.tsx# Manajemen server OpenVPN (CRUD, modal, detail)
     │   ├── vpn-clients-page.tsx# Manajemen client OpenVPN (CRUD, .ovpn download, email)
     │   ├── users-page.tsx      # Manajemen pengguna internal
-    │   ├── roles-page.tsx      # Manajemen role dan izin
+    │   ├── roles-page.tsx      # Manajemen role dan matriks permission interaktif
     │   ├── profile-page.tsx    # Profil pengguna & ganti password
     │   └── not-found-page.tsx  # Halaman 404 Not Found
     ├── routes/                 # Konfigurasi TanStack Router
@@ -76,7 +80,7 @@ devops-panel/
     ├── styles/                 # Global styles
     │   └── globals.css         # Tailwind v4, OKLCH color tokens, .dark class
     └── types/                  # TypeScript definitions
-        ├── auth.ts             # DTO response, UserProfile, Role, Pagination
+        ├── auth.ts             # DTO response, UserProfile, Role, PermissionItem, Pagination
         ├── vpn-server.ts       # DTO VPNServer, Create/Update payload, Pagination
         └── vpn-client.ts       # DTO VPNClient, Create/Update payload, Pagination
 ```
@@ -89,10 +93,10 @@ devops-panel/
 |---|---|---|---|---|
 | `/login` | `LoginPage` | ✅ Selesai | `publicRouteGuard` | Login autentikasi, support Light & Dark theme shadcn UI, toggle show password |
 | `/` | `DashboardPage` | ✅ Selesai | `protectedRouteGuard` | Kartu selamat datang, info akun, aksi logout |
-| `/vpn-servers` | `VPNServersPage` | ✅ Selesai | `protectedRouteGuard` | CRUD OpenVPN server, modal dialog, detail server, horizontal scroll table |
-| `/vpn-clients` | `VPNClientsPage` | ✅ Selesai | `protectedRouteGuard` | CRUD client OpenVPN, penerbitan sertifikat, unduh profil `.ovpn`, kirim email, statistik data |
-| `/users` | `UsersPage` | ✅ Selesai | `protectedRouteGuard` | Tabel user dengan paginasi, pencarian, create, edit modal, toggle aktif |
-| `/roles` | `RolesPage` | ✅ Selesai | `protectedRouteGuard` | Tabel role dengan paginasi, pencarian, create, edit modal |
+| `/vpn-servers` | `VPNServersPage` | ✅ Selesai | `permissionRouteGuard("vpn_servers:read")` | CRUD OpenVPN server, modal dialog, detail server, proteksi aksi `<Can>` |
+| `/vpn-clients` | `VPNClientsPage` | ✅ Selesai | `permissionRouteGuard("vpn_clients:read")` | CRUD client OpenVPN, penerbitan sertifikat, unduh profil `.ovpn`, kirim email, proteksi aksi `<Can>` |
+| `/users` | `UsersPage` | ✅ Selesai | `permissionRouteGuard("users:read")` | Tabel user dengan paginasi, pencarian, create, edit modal, proteksi aksi `<Can>` |
+| `/roles` | `RolesPage` | ✅ Selesai | `permissionRouteGuard("roles:read")` | Manajemen role kustom dengan checklist matriks hak akses per modul |
 | `/profile` | `ProfilePage` | ✅ Selesai | `protectedRouteGuard` | Detail profil pengguna yang sedang login & form ganti password |
 | `*` | `NotFoundPage` | ✅ Selesai | — | Tampilan 404 dengan tombol navigasi kembali |
 | `/logs` | Planned | ⏳ Rencana | `protectedRouteGuard` | Log histori koneksi VPN OpenVPN |
@@ -123,6 +127,47 @@ devops-panel/
    - Jika endpoint merespons HTTP 401, interceptor mencoba me-refresh token via `GET /api/auth/refresh/:id`.
    - Jika refresh berhasil, request yang sempat gagal diulang dengan token baru.
    - Jika refresh gagal (sesi habis), `auth-store` dibersihkan dan user diarahkan ke `/login`.
+
+---
+
+## Role-Based Access Control (RBAC) Architecture
+
+Sistem hak akses di frontend dirancang modular dan granular berbasis permission code dengan format `<resource>:<action>` (contoh: `vpn_servers:create`, `users:delete`).
+
+### 1. Hook `usePermission` (`src/hooks/use-permission.ts`)
+Menyediakan helper reaktif untuk memeriksa izin pengguna saat ini:
+- `can(permissionCode: string): boolean`: Mengecek apakah user memiliki kode permission tertentu.
+- `canAny(permissionCodes: string[]): boolean`: Mengembalikan `true` jika user memiliki salah satu izin dalam array.
+- `canAll(permissionCodes: string[]): boolean`: Mengembalikan `true` jika user memiliki seluruh izin dalam array.
+- `isSuperadmin: boolean`: Mengembalikan `true` jika role user adalah **Superadmin** (otomatis membypass semua pengecekan izin).
+
+### 2. Komponen Deklaratif `<Can>` (`src/components/can.tsx`)
+Membungkus tombol, dialog, atau komponen UI apa pun. Jika user tidak memiliki izin, konten disembunyikan (atau menampilkan fallback opsional):
+```tsx
+<Can do="vpn_servers:create">
+  <Button onClick={openCreateModal}>Tambah Server</Button>
+</Can>
+```
+
+### 3. Route Guard (`permissionRouteGuard`)
+Mencegah user mengakses halaman melalui navigasi URL langsung jika hak akses bacanya tidak terpenuhi:
+```ts
+const vpnServersRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/vpn-servers",
+  component: VPNServersPage,
+  beforeLoad: permissionRouteGuard("vpn_servers:read"),
+})
+```
+
+### 4. Dynamic Sidebar Filtering (`src/components/sidebar.tsx`)
+Menu navigasi sidebar secara otomatis disaring. Item menu yang permission `read`-nya tidak dimiliki oleh user otomatis disembunyikan dari DOM.
+
+### 5. Custom Role & Permission Matrix (`/roles`)
+Halaman manajemen role menyediakan matriks checklist hak akses yang dikelompokkan per modul:
+- Modul: **VPN Server Management**, **VPN Client Management**, **User Management**, **Role Management**.
+- Mendukung fitur *Pilih Semua per Modul* (dengan status indeterminate checkbox) dan shortcut *Pilih Semua Global*.
+- Role baru yang disimpan langsung dapat di-assign ke user di halaman `/users`.
 
 ---
 

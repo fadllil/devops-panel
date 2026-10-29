@@ -4,6 +4,30 @@ export type ApiResponse<T> = {
   code: number
 }
 
+export type PermissionItem = {
+  id: string
+  code: string
+  resource: string
+  action: string
+  description: string
+  created_at?: string
+}
+
+export type ResourcePermissions = {
+  resource: string
+  permissions: PermissionItem[]
+}
+
+export type RoleDetail = {
+  id: string
+  name: string
+  description?: string
+  created_at: string
+  updated_at: string
+  permissions?: PermissionItem[]
+  permission_codes?: string[]
+}
+
 export type UserProfile = {
   id: string
   username: string
@@ -12,7 +36,7 @@ export type UserProfile = {
   is_active: boolean
   created_at?: string | number
   updated_at?: string | number
-  data_role?: Record<string, unknown> | null
+  data_role?: RoleDetail | null
 }
 
 export type LoginRequest = {
@@ -32,7 +56,7 @@ export type UserSummary = {
   is_active: boolean
   created_at: string
   updated_at: string
-  data_role?: Record<string, unknown> | null
+  data_role?: RoleDetail | null
 }
 
 export type PageMetadata = {
@@ -58,8 +82,11 @@ export type UserListParams = {
 export type RoleSummary = {
   id: string
   name: string
+  description?: string
   created_at: string
   updated_at: string
+  permissions?: PermissionItem[]
+  permission_codes?: string[]
 }
 
 export type RoleListResponse = {
@@ -73,6 +100,18 @@ export type RoleListParams = {
   search?: string
   sort_field?: string
   sort_by?: string
+}
+
+export type CreateRolePayload = {
+  name: string
+  description?: string
+  permission_ids?: string[]
+}
+
+export type UpdateRolePayload = {
+  name: string
+  description?: string
+  permission_ids?: string[]
 }
 
 export type CreateUserPayload = {

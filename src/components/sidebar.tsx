@@ -9,52 +9,72 @@ import {
 } from "lucide-react"
 
 import { Button } from "#components/ui/button"
+import { usePermission } from "../hooks/use-permission"
 
 type SidebarProps = {
   active: "dashboard" | "users" | "roles" | "profile" | "vpn-servers" | "vpn-clients"
 }
 
-const links = [
+type NavLink = {
+  key: SidebarProps["active"]
+  label: string
+  icon: typeof LayoutDashboard
+  path: string
+  permission: string | null
+}
+
+const links: NavLink[] = [
   {
-    key: "dashboard" as const,
+    key: "dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
     path: "/",
+    permission: null,
   },
   {
-    key: "vpn-servers" as const,
+    key: "vpn-servers",
     label: "VPN Servers",
     icon: Server,
     path: "/vpn-servers",
+    permission: "vpn_servers:read",
   },
   {
-    key: "vpn-clients" as const,
+    key: "vpn-clients",
     label: "VPN Clients",
     icon: KeyRound,
     path: "/vpn-clients",
+    permission: "vpn_clients:read",
   },
   {
-    key: "users" as const,
+    key: "users",
     label: "Users",
     icon: Users,
     path: "/users",
+    permission: "users:read",
   },
   {
-    key: "roles" as const,
+    key: "roles",
     label: "Roles",
     icon: Shield,
     path: "/roles",
+    permission: "roles:read",
   },
   {
-    key: "profile" as const,
+    key: "profile",
     label: "Profile",
     icon: UserCircle2,
     path: "/profile",
+    permission: null,
   },
 ]
 
 export function Sidebar({ active }: SidebarProps) {
   const navigate = useNavigate()
+  const { can } = usePermission()
+
+  const visibleLinks = links.filter(
+    (link) => link.permission === null || can(link.permission),
+  )
 
   return (
     <aside className="w-full max-w-[280px] border-r border-border bg-card text-card-foreground md:min-h-screen">
@@ -67,7 +87,7 @@ export function Sidebar({ active }: SidebarProps) {
         </div>
 
         <nav className="space-y-2">
-          {links.map((link) => {
+          {visibleLinks.map((link) => {
             const Icon = link.icon
             const isActive = active === link.key
 
